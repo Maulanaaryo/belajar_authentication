@@ -1,5 +1,6 @@
 const { user } = require("../models");
 const { decryptPwd } = require("../helpers/bcrypt");
+const { tokenGenerator } = require("../helpers/jsonwebtoken");
 
 class UserController {
   static async getAllUsers(req, res) {
@@ -39,7 +40,9 @@ class UserController {
 
       if (emailFound) {
         if (decryptPwd(password, emailFound.password)) {
-          res.status(200).json(emailFound);
+          let access_token = tokenGenerator(emailFound);
+
+          res.status(200).json({ access_token });
         } else {
           res.status(403).json({
             message: `Invalid Password`,
